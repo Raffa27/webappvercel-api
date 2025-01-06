@@ -6,7 +6,11 @@ const cors = require('cors');
 const app = express();
 
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://webappvercel-kohl.vercel.app'],
+  origin: [
+    'http://localhost:5173',
+    'https://webappvercel-kohl.vercel.app',
+    'https://webappvercel.vercel.app'
+  ],
   methods: ['POST', 'GET', 'OPTIONS'],
   credentials: true
 }));
