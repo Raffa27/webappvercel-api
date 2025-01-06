@@ -24,6 +24,10 @@ app.post('/send-email', async (req, res) => {
   try {
     const { name, email, phone, message } = req.body;
     console.log('Request body:', req.body);
+    console.log('Email config:', {
+      user: process.env.EMAIL_USER ? 'Vorhanden' : 'Fehlt',
+      pass: process.env.EMAIL_PASS ? 'Vorhanden' : 'Fehlt'
+    });
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -33,22 +37,30 @@ app.post('/send-email', async (req, res) => {
         Name: ${name}
         Email: ${email}
         Telefon: ${phone || 'Nicht angegeben'}
-        
+       
         Nachricht:
         ${message}
       `
     };
     console.log('Mail options:', mailOptions);
-
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Mail sent:', info);
     res.status(200).json({ message: 'Email erfolgreich gesendet' });
   } catch (error) {
     console.error('Detaillierter Fehler:', error);
-    res.status(500).json({ error: 'Email konnte nicht gesendet werden' });
+    res.status(500).json({ 
+      error: 'Email konnte nicht gesendet werden',
+      details: error.message 
+    });
   }
 });
 
 const PORT = process.env.PORT || 3001; // Ändere auf 3001
-app.listen(PORT, () => {
-  console.log(`Server läuft auf Port ${PORT}`);
-});
+if (process.env.NODE_ENV !== 'production') {
+  const PORT = process.env.PORT || 3001;
+  app.listen(PORT, () => {
+    console.log(`Server läuft auf Port ${PORT}`);
+  });
+}
+
+module.exports = app;
