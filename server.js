@@ -2,19 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const nodemailer = require('nodemailer');
 const cors = require('cors');
-
 const app = express();
 
-app.use(cors({
-  origin: [
-    'http://localhost:5173',
-    'https://webappvercel-kohl.vercel.app',
-    'https://webappvercel.vercel.app'
-  ],
-  methods: ['POST', 'GET', 'OPTIONS'],
-  credentials: true
-}));
+// CORS vor allen anderen Middleware
+app.use(cors());  // Erlaubt alle Origins zunächst zum Testen
+
 app.use(express.json());
+
+// Test Route
+app.get('/test', (req, res) => {
+  res.json({ message: 'Server is running' });
+});
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
@@ -41,7 +39,7 @@ app.post('/send-email', async (req, res) => {
         Name: ${name}
         Email: ${email}
         Telefon: ${phone || 'Nicht angegeben'}
-       
+        
         Nachricht:
         ${message}
       `
@@ -59,7 +57,6 @@ app.post('/send-email', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 3001; // Ändere auf 3001
 if (process.env.NODE_ENV !== 'production') {
   const PORT = process.env.PORT || 3001;
   app.listen(PORT, () => {
